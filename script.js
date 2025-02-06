@@ -9,6 +9,8 @@ async function submitSignup() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
+  console.log('Attempting to sign up:', { username, email });
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -18,8 +20,10 @@ async function submitSignup() {
   });
 
   if (error) {
+    console.error('Signup failed:', error);
     alert('Signup failed: ' + error.message);
   } else {
+    console.log('Signup successful:', data);
     alert('Signup successful! Please check your email to verify.');
     window.location.href = 'login.html';
   }
@@ -30,80 +34,19 @@ async function submitLogin() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
+  console.log('Attempting to log in:', { email });
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
 
   if (error) {
+    console.error('Login failed:', error);
     alert('Login failed: ' + error.message);
   } else {
+    console.log('Login successful:', data);
     alert('Login successful!');
-    window.location.href = 'dashboard.html'; // Redirect to dashboard after login
-  }
-  // Show Add Item Page
-function showAddItemPage() {
-    document.getElementById('content').innerHTML = `
-      <h2>Add Item</h2>
-      <form id="addItemForm">
-        <label for="itemName">Item Name:</label><br>
-        <input type="text" id="itemName" name="itemName"><br>
-        <label for="barcode">Barcode:</label><br>
-        <input type="text" id="barcode" name="barcode"><br>
-        <label for="expiryDate">Expiry Date:</label><br>
-        <input type="date" id="expiryDate" name="expiryDate"><br><br>
-        <button type="button" onclick="submitItem()">Submit</button>
-      </form>
-    `;
-  }
-  
-  // Submit Item
-  async function submitItem() {
-    const itemName = document.getElementById('itemName').value;
-    const barcode = document.getElementById('barcode').value;
-    const expiryDate = document.getElementById('expiryDate').value;
-  
-    const user = supabase.auth.user();
-    const { data, error } = await supabase
-      .from('items')
-      .insert([
-        {
-          merchant_id: user.id,
-          item_name: itemName,
-          barcode: barcode,
-          expiry_date: expiryDate
-        }
-      ]);
-  
-    if (error) {
-      alert('Failed to add item: ' + error.message);
-    } else {
-      alert('Item added successfully!');
-    }
-  }
-  // Show Item List Page
-async function showItemListPage() {
-    const user = supabase.auth.user();
-    const { data, error } = await supabase
-      .from('items')
-      .select('*')
-      .eq('merchant_id', user.id);
-  
-    if (error) {
-      alert('Failed to fetch items: ' + error.message);
-      return;
-    }
-  
-    let content = '<h2>Your Items</h2><table border="1">';
-    content += '<tr><th>Item Name</th><th>Barcode</th><th>Expiry Date</th></tr>';
-    data.forEach(item => {
-      content += `<tr>
-                    <td>${item.item_name}</td>
-                    <td>${item.barcode}</td>
-                    <td>${item.expiry_date}</td>
-                  </tr>`;
-    });
-    content += '</table>';
-    document.getElementById('content').innerHTML = content;
+    window.location.href = 'dashboard.html';
   }
 }
